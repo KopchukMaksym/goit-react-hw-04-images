@@ -16,6 +16,7 @@ export const App = () => {
     if (!!query) {
       getImagesFromApi();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, page]);
 
   const getImagesFromApi = async () => {

@@ -5,13 +5,13 @@ import s from '../Modal/Modal.module.css';
 export const Modal = ({ originUrl, closeModal }) => {
   useEffect(() => {
     document.addEventListener('keydown', closeModal);
-  }, []);
+  }, [closeModal]);
 
   useEffect(() => {
     return () => {
       document.removeEventListener('keydown', closeModal);
     };
-  }, []);
+  }, [closeModal]);
 
   const closeImgModal = ({ target, currentTarget, code }) => {
     if (target === currentTarget || code === 'Escape') {
