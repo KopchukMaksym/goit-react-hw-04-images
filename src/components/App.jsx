@@ -1,60 +1,54 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchApi } from 'api/fetchApi';
-import Searchbar from './Searchbar/Searchbar';
+import { Searchbar } from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import s from '../components/App.module.css';
 
-class App extends Component {
-  state = {
-    data: [],
-    page: 1,
-    query: '',
-    isLoading: false,
-  };
+export const App = () => {
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
-    if ((query && prevState.query !== query) || page > prevState.page) {
-      this.getImagesFromApi();
+  useEffect(() => {
+    if (!!query) {
+      getImagesFromApi();
     }
-  }
+  }, [query, page]);
 
-  getImagesFromApi = async () => {
-    this.setState({ isLoading: true });
+  const getImagesFromApi = async () => {
+    setIsLoading(true);
 
     try {
-      const { data } = await fetchApi(this.state.query, this.state.page);
-      this.setState({ data: [...this.state.data, ...data.hits] });
+      const { data: dataHits } = await fetchApi(query, page);
+      setData([...data, ...dataHits.hits]);
     } catch (error) {
-      this.setState({ error });
+      console.log('error', error);
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
 
-  searchImg = query => {
-    if (query !== this.state.query) {
-      this.setState({ query: query, page: 1, data: [] });
+  const searchImg = search => {
+    if (search !== query) {
+      setData([]);
+      setQuery(search);
+      setPage(1);
     }
   };
 
-  loadMore = () => {
-    this.setState({ page: this.state.page + 1 });
+  const loadMore = () => {
+    setPage(page + 1);
   };
 
-  render() {
-    const { data, isLoading } = this.state;
-    return (
-      <div className={s.app}>
-        <Searchbar onSubmit={this.searchImg} />
-        {!!data.length && <ImageGallery data={data} />}
-        {isLoading && <Loader />}
-        {!!data.length && <Button onClick={this.loadMore} />}
-      </div>
-    );
-  }
-}
-
-export default App;
+  return (
+    <div className={s.app}>
+      <Searchbar onSubmit={searchImg} />
+      {!!data.length && <ImageGallery data={data} />}
+      {isLoading && <Loader />}
+      {!!data.length && <Button onClick={loadMore} />}
+    </div>
+  );
+};

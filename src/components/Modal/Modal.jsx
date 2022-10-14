@@ -1,34 +1,32 @@
-import { Component } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import s from '../Modal/Modal.module.css';
 
-class Modal extends Component {
-  componentDidMount() {
-    document.addEventListener('keydown', this.closeModal);
-  }
+export const Modal = ({ originUrl, closeModal }) => {
+  useEffect(() => {
+    document.addEventListener('keydown', closeModal);
+  }, []);
 
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.closeModal);
-  }
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('keydown', closeModal);
+    };
+  }, []);
 
-  closeModal = ({ target, currentTarget, code }) => {
+  const closeImgModal = ({ target, currentTarget, code }) => {
     if (target === currentTarget || code === 'Escape') {
-      this.props.closeModal();
+      closeModal();
     }
   };
 
-  render() {
-    return (
-      <div className={s.overlay} onClick={this.closeModal}>
-        <div className={s.modal}>
-          <img src={this.props.originUrl} alt="" />
-        </div>
+  return (
+    <div className={s.overlay} onClick={closeImgModal}>
+      <div className={s.modal}>
+        <img src={originUrl} alt="" />
       </div>
-    );
-  }
-}
-
-export default Modal;
+    </div>
+  );
+};
 
 Modal.propTypes = {
   originUrl: PropTypes.string,
